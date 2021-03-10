@@ -5,6 +5,7 @@
   <version>0.1.0</version>
   <analysisType>DEFAULT</analysisType>
   <inputs>
+    <sequenceReadsSingle>sequence_reads_list_single</sequenceReadsSingle>
     <reference>reference</reference>
     <requiresSingleSample>true</requiresSingleSample>
   </inputs>
@@ -66,6 +67,10 @@
   </parameters>
   <outputs>
     <output name="guppyplex_filtered" fileName="guppyplex_filtered"/>
+    <output name="consensus_fasta" fileName="consensus_fasta"/>
+    <output name="variants_pass_vcf" fileName="variants_pass_vcf"/>
+    <output name="coverage_mask" fileName="coverage_mask"/>
+    <output name="plot_output.png" fileName="plot_output.png"/>
   </outputs>
   <toolRepositories>
     <repository>
