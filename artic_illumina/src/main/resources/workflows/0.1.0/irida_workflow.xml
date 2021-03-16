@@ -3,7 +3,7 @@
   <id>5b117a86-b449-4ac5-adc8-e4f410b843b9</id>
   <name>ArticIllumina</name>
   <version>0.1.0</version>
-  <analysisType>DEFAULT</analysisType>
+  <analysisType>ARTICILLUMINA_PIPELINE</analysisType>
   <inputs>
     <sequenceReadsPaired>sequence_reads_list_paired</sequenceReadsPaired>
     <reference>reference</reference>

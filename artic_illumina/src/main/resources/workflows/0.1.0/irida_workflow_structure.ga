@@ -14,6 +14,10 @@
         "input_bam" : {
           "id" : 7,
           "output_name" : "output_bam"
+        },
+        "ref": {
+          "id": 1,
+          "output_name": "output"
         }
       },
       "label" : null,
@@ -471,7 +475,7 @@
         "uuid" : "819f6a45-e7a9-43c1-a93b-ba0a9dd1f2ab"
       } ],
       "input_connections" : { },
-      "label" : "Paired read collection for samples",
+      "label" : "sequence_reads_list_paired",
       "id" : 0,
       "tool_state" : "{\"optional\": false, \"collection_type\": \"paired\"}",
       "errors" : null,
@@ -493,7 +497,7 @@
       "annotation" : "",
       "inputs" : [ {
         "description" : "",
-        "name" : "Paired read collection for samples"
+        "name" : "sequence_reads_list_paired"
       } ],
       "content_id" : null,
       "tool_id" : null
