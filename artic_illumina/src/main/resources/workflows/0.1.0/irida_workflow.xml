@@ -7,7 +7,7 @@
   <inputs>
     <sequenceReadsPaired>sequence_reads_list_paired</sequenceReadsPaired>
     <reference>reference</reference>
-    <requiresSingleSample>false</requiresSingleSample>
+    <requiresSingleSample>true</requiresSingleSample>
   </inputs>
   <parameters>
     <parameter name="fastp-2-single_paired.adapter_trimming_options.adapter_sequence2" defaultValue="">
@@ -192,7 +192,10 @@
     </parameter>
   </parameters>
   <outputs>
-    <output name="#{infile}" fileName="#{infile}"/>
+    <output name="ivar_variants.csv" fileName="ivar_variants.csv"/>
+    <output name="infile" fileName="infile"/>
+    <output name="ivar_consensus.fasta" fileName="ivar_consensus.fasta"/>
+    <output name="multiqc_output.html" fileName="multiqc_output.html"/>
   </outputs>
   <toolRepositories>
     <repository>
