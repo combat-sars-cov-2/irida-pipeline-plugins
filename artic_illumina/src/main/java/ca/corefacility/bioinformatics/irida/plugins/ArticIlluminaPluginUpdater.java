@@ -6,14 +6,13 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
+import static java.util.Map.entry;
 import java.util.Map;
 import java.util.Set;
-
-import com.google.common.collect.ImmutableMap;
+import java.util.Scanner;
 
 import ca.corefacility.bioinformatics.irida.exceptions.IridaWorkflowNotFoundException;
 import ca.corefacility.bioinformatics.irida.exceptions.PostProcessingException;
-import ca.corefacility.bioinformatics.irida.model.sample.MetadataTemplateField;
 import ca.corefacility.bioinformatics.irida.model.sample.Sample;
 import ca.corefacility.bioinformatics.irida.model.sample.metadata.MetadataEntry;
 import ca.corefacility.bioinformatics.irida.model.sample.metadata.PipelineProvidedMetadataEntry;
@@ -26,6 +25,34 @@ import ca.corefacility.bioinformatics.irida.service.sample.MetadataTemplateServi
 import ca.corefacility.bioinformatics.irida.service.sample.SampleService;
 import ca.corefacility.bioinformatics.irida.service.workflow.IridaWorkflowsService;
 
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+class QCReport {
+	public String sample_name;
+    public float pct_N_bases;
+    public float pct_covered_bases;
+    public float num_aligned_reads;
+    public String fasta;
+	public String bam;
+    public String qc_pass;
+}
+
+class MetadataValue {
+    public String header;
+    public String value;
+
+    MetadataValue(String header, String value) {
+        this.header = header;
+        this.value = value;	
+    }
+
+}
+
+
 /**
  * This implements a class used to perform post-processing on the analysis
  * pipeline results to extract information to write into the IRIDA metadata
@@ -34,6 +61,9 @@ import ca.corefacility.bioinformatics.irida.service.workflow.IridaWorkflowsServi
  * or the README.md file in this project for more details.
  */
 public class ArticIlluminaPluginUpdater implements AnalysisSampleUpdater {
+	//private static final Logger logger = LoggerFactory.getLogger(ArticIlluminaPluginUpdater.class);
+
+	private static final String QC_FILE = "qc.json";
 
 	private final MetadataTemplateService metadataTemplateService;
 	private final SampleService sampleService;
@@ -80,11 +110,8 @@ public class ArticIlluminaPluginUpdater implements AnalysisSampleUpdater {
 		final Sample sample = samples.iterator().next();
 
 		// extracts paths to the analysis result files
-		AnalysisOutputFile hashAnalysisFile = analysis.getAnalysis().getAnalysisOutputFile("hash.txt");
-		Path hashFile = hashAnalysisFile.getFile();
-
-		AnalysisOutputFile readCountAnalysisFile = analysis.getAnalysis().getAnalysisOutputFile("read-count.txt");
-		Path readCountFile = readCountAnalysisFile.getFile();
+		AnalysisOutputFile qcFile = analysis.getAnalysis().getAnalysisOutputFile(QC_FILE);
+		Path filePath = qcFile.getFile();
 
 		try {
 			Map<String, MetadataEntry> metadataEntries = new HashMap<>();
@@ -94,122 +121,41 @@ public class ArticIlluminaPluginUpdater implements AnalysisSampleUpdater {
 			String workflowVersion = iridaWorkflow.getWorkflowDescription().getVersion();
 			String workflowName = iridaWorkflow.getWorkflowDescription().getName();
 
-			// gets information from the "hash.txt" output file and constructs metadata
-			// objects
-			Map<String, String> hashValues = parseHashFile(hashFile);
-			for (String hashType : hashValues.keySet()) {
-				final String hashValue = hashValues.get(hashType);
+			//Read the CSV file from qc_uk output
+			@SuppressWarnings("resource")
+			String jsonFile = new Scanner(new BufferedReader(new FileReader(filePath.toFile()))).useDelimiter("\\Z").next();
 
-				PipelineProvidedMetadataEntry hashEntry = new PipelineProvidedMetadataEntry(hashValue, "text",
-						analysis);
+			// map the results into a Map
+			ObjectMapper mapper = new ObjectMapper();
+			QCReport qcResults = mapper.readValue(jsonFile, QCReport.class);
 
-				// key will be string like 'ReadInfo/md5 (v0.1.0)'
-				String key = workflowName + "/" + hashType + " (v" + workflowVersion + ")";
-				metadataEntries.put(key, hashEntry);
-			}
-
-			// gets read count information from "read-count.txt" file and builds metadata
-			// objects
-			Long readCount = parseReadCount(readCountFile);
-			PipelineProvidedMetadataEntry readCountEntry = new PipelineProvidedMetadataEntry(readCount.toString(),
-					"text", analysis);
-
-			// key will be string like 'ReadInfo/readCount (v0.1.0)'
-			String key = workflowName + "/readCount (v" + workflowVersion + ")";
-			metadataEntries.put(key, readCountEntry);
-
+			// @formatter:off/* 
+			//Map<String, MetadataValue> qcFields = new HashMap<>(Map.ofEntries());
+			Map<String, MetadataValue> qcFields = new HashMap<>(Map.ofEntries(
+			 	entry("pct_N_bases", new MetadataValue("Percentage N Bases", Float.toString(qcResults.pct_N_bases))),
+			 	entry("pct_covered_bases", new MetadataValue("Percentage Covered Bases", Float.toString(qcResults.pct_covered_bases))),
+			 	entry("num_aligned_reads", new MetadataValue("Number of Aligned Reads", Float.toString(qcResults.num_aligned_reads))),
+			 	entry("qc_pass", new MetadataValue("Quality Control Pass", qcResults.qc_pass))));
+			// @formatter:on */
+			qcFields.put("workflow_name", new MetadataValue("Workflow Name", workflowName));
+			qcFields.put("workflow_version", new MetadataValue("Workflow Version", workflowVersion));
+				
+			qcFields.entrySet().forEach(entry -> {
+				PipelineProvidedMetadataEntry metadataEntry =
+					new PipelineProvidedMetadataEntry(entry.getValue().value, "text", analysis);
+				metadataEntries.put(entry.getValue().header, metadataEntry);
+			});
 			Set<MetadataEntry> metadataSet = metadataTemplateService.convertMetadataStringsToSet(metadataEntries);
-
-			// merges with existing sample metadata and does an update of the sample metadata
-			sampleService.mergeSampleMetadata(sample,metadataSet);
-
+			samples.forEach(s -> {
+				sampleService.mergeSampleMetadata(s, metadataSet);
+			});
+		} catch (JsonProcessingException e) {
+			throw new PostProcessingException("Error parsing CSV from qc.csv results", e);
 		} catch (IOException e) {
 			throw new PostProcessingException("Error parsing hash file", e);
 		} catch (IridaWorkflowNotFoundException e) {
 			throw new PostProcessingException("Could not find workflow for id=" + analysis.getWorkflowId(), e);
 		}
-	}
-
-	/**
-	 * Parses out the read count from the passed file.
-	 * 
-	 * @param readCountFile The file containing the read count. The file contents
-	 *                      should look like (representing 10 reads):
-	 * 
-	 *                      <pre>
-	 *                      10
-	 *                      </pre>
-	 * 
-	 * @return A {@link Long} containing the read count.
-	 * @throws IOException If there was an error reading the file.
-	 */
-	private Long parseReadCount(Path readCountFile) throws IOException {
-		BufferedReader readCountReader = new BufferedReader(new FileReader(readCountFile.toFile()));
-		Long readCount = null;
-
-		try {
-			String line = readCountReader.readLine();
-			readCount = Long.parseLong(line);
-		} finally {
-			readCountReader.close();
-		}
-
-		return readCount;
-	}
-
-	/**
-	 * Parses out values from the hash file into a {@link Map} linking 'hashType' to
-	 * 'hashValue'.
-	 * 
-	 * @param hashFile The {@link Path} to the file containing the hash values from
-	 *                 the pipeline. This file should contain contents like:
-	 * 
-	 *                 <pre>
-	 * #md5                                sha1
-	 * d54d78010cf8eeaa76c46646846be4f2    5908a485e47f870d3f9d72ff1e55796512047f00
-	 *                 </pre>
-	 * 
-	 * @return A {@link Map} linking 'hashType' to 'hashValue'.
-	 * @throws IOException             If there was an error reading the file.
-	 * @throws PostProcessingException If there was an error parsing the file.
-	 */
-	private Map<String, String> parseHashFile(Path hashFile) throws IOException, PostProcessingException {
-		Map<String, String> hashTypeValues = new HashMap<>();
-
-		BufferedReader hashReader = new BufferedReader(new FileReader(hashFile.toFile()));
-
-		try {
-			String headerLine = hashReader.readLine();
-
-			if (!headerLine.startsWith("#")) {
-				throw new PostProcessingException("Missing '#' in header of file " + hashFile);
-			} else {
-				// strip off '#' prefix
-				headerLine = headerLine.substring(1);
-			}
-
-			String[] hashTypes = headerLine.split("\t");
-
-			String hashValuesLine = hashReader.readLine();
-			String[] hashValues = hashValuesLine.split("\t");
-
-			if (hashTypes.length != hashValues.length) {
-				throw new PostProcessingException("Unmatched fields in header and values from file " + hashFile);
-			}
-
-			for (int i = 0; i < hashTypes.length; i++) {
-				hashTypeValues.put(hashTypes[i], hashValues[i]);
-			}
-
-			if (hashReader.readLine() != null) {
-				throw new PostProcessingException("Too many lines in file " + hashFile);
-			}
-		} finally {
-			// make sure to close, even in cases where an exception is thrown
-			hashReader.close();
-		}
-
-		return hashTypeValues;
 	}
 
 	/**

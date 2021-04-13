@@ -184,9 +184,6 @@
     <parameter name="multiqc-11-title" defaultValue="">
       <toolParameter toolId="7bef6cf2-e18f-40c7-93d2-e6f277781309" parameterName="title" label="Report title" type="text"/>
     </parameter>
-    <parameter name="qc-12-input_type_conditional.input_type" defaultValue="single">
-      <toolParameter toolId="f800a02e-8b0b-4371-b8b4-53b7961a76c7" parameterName="input_type_conditional.input_type" label="Input Type" type="select"/>
-    </parameter>
     <parameter name="qc-12-qc_type_conditional.qc_type" defaultValue="--illumina">
       <toolParameter toolId="f800a02e-8b0b-4371-b8b4-53b7961a76c7" parameterName="qc_type_conditional.qc_type" label="Input Type" type="select"/>
     </parameter>
@@ -204,6 +201,7 @@
     <output name="infile" fileName="infile"/>
     <output name="qc.csv" fileName="qc.csv"/>
     <output name="qc.png" fileName="qc.png"/>
+    <output name="qc.json" fileName="qc.json"/>
   </outputs>
   <toolRepositories>
     <repository>

@@ -161,13 +161,13 @@
     },
     "8" : {
       "workflow_outputs" : [ {
-        "label" : "Raw data for QualiMap BamQC on input dataset(s)",
-        "output_name" : "raw_data",
-        "uuid" : "9df7ab93-a5b7-4744-a90f-04aa87cf3a15"
-      }, {
         "label" : "QualiMap BamQC report on input dataset(s)",
         "output_name" : "output_html",
         "uuid" : "f87a6533-d9fa-4841-975c-c1b9aaa3e84e"
+      }, {
+        "label" : "Raw data for QualiMap BamQC on input dataset(s)",
+        "output_name" : "raw_data",
+        "uuid" : "9df7ab93-a5b7-4744-a90f-04aa87cf3a15"
       } ],
       "input_connections" : {
         "input1" : {
@@ -320,15 +320,11 @@
         "input_ref" : {
           "id" : 1,
           "output_name" : "output"
-        },
-        "input_type_conditional|input_sample" : {
-          "id" : 0,
-          "output_name" : "output"
         }
       },
       "label" : null,
       "id" : 12,
-      "tool_state" : "{\"input_bam\": {\"__class__\": \"RuntimeValue\"}, \"input_cons_fasta\": {\"__class__\": \"RuntimeValue\"}, \"input_ref\": {\"__class__\": \"RuntimeValue\"}, \"input_type_conditional\": {\"input_type\": \"single\", \"__current_case__\": 0, \"input_sample\": {\"__class__\": \"RuntimeValue\"}}, \"qc_type_conditional\": {\"qc_type\": \"--illumina\", \"__current_case__\": 1}, \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+      "tool_state" : "{\"input_bam\": {\"__class__\": \"RuntimeValue\"}, \"input_cons_fasta\": {\"__class__\": \"RuntimeValue\"}, \"input_ref\": {\"__class__\": \"RuntimeValue\"}, \"qc_type_conditional\": {\"qc_type\": \"--illumina\", \"__current_case__\": 0}, \"__page__\": null, \"__rerun_remap_job_id__\": null}",
       "errors" : null,
       "position" : {
         "left" : 2202,
@@ -341,16 +337,19 @@
         "type" : "csv"
       }, {
         "name" : "output2",
+        "type" : "json"
+      }, {
+        "name" : "output3",
         "type" : "png"
       } ],
       "tool_shed_repository" : {
-        "changeset_revision" : "e34ab51fa707",
+        "changeset_revision" : "499b71c93c5d",
         "name" : "qc",
         "owner" : "sanbi-uwc",
         "tool_shed" : "testtoolshed.g2.bx.psu.edu"
       },
       "type" : "tool",
-      "tool_version" : "0.1.0",
+      "tool_version" : "0.1.1",
       "annotation" : "",
       "inputs" : [ {
         "description" : "runtime parameter for tool Quality Control (COG-UK QC)",
@@ -361,9 +360,6 @@
       }, {
         "description" : "runtime parameter for tool Quality Control (COG-UK QC)",
         "name" : "input_ref"
-      }, {
-        "description" : "runtime parameter for tool Quality Control (COG-UK QC)",
-        "name" : "input_type_conditional"
       } ],
       "post_job_actions" : {
         "RenameDatasetActionoutput1" : {
@@ -375,14 +371,21 @@
         },
         "RenameDatasetActionoutput2" : {
           "action_arguments" : {
-            "newname" : "qc.png"
+            "newname" : "qc.json"
           },
           "action_type" : "RenameDatasetAction",
           "output_name" : "output2"
+        },
+        "RenameDatasetActionoutput3" : {
+          "action_arguments" : {
+            "newname" : "qc.png"
+          },
+          "action_type" : "RenameDatasetAction",
+          "output_name" : "output3"
         }
-       },
-      "content_id" : "testtoolshed.g2.bx.psu.edu/repos/sanbi-uwc/qc/qc_cog_uk/0.1.0",
-      "tool_id" : "testtoolshed.g2.bx.psu.edu/repos/sanbi-uwc/qc/qc_cog_uk/0.1.0"
+      },
+      "content_id" : "testtoolshed.g2.bx.psu.edu/repos/sanbi-uwc/qc/qc_cog_uk/0.1.1",
+      "tool_id" : "testtoolshed.g2.bx.psu.edu/repos/sanbi-uwc/qc/qc_cog_uk/0.1.1"
     },
     "13" : {
       "workflow_outputs" : [ {
@@ -481,7 +484,7 @@
       "workflow_outputs" : [ {
         "label" : null,
         "output_name" : "output",
-        "uuid" : "565e74b6-7264-43e5-b475-4f6f03fa262b"
+        "uuid" : "ed684115-d7cb-4830-a966-63d586ef5e08"
       } ],
       "input_connections" : { },
       "label" : "reference",
@@ -509,7 +512,7 @@
       "workflow_outputs" : [ {
         "label" : null,
         "output_name" : "output",
-        "uuid" : "1ca5c419-f2a2-4749-af1f-a2ee86a510fc"
+        "uuid" : "de303dcf-059e-4cda-b859-f42b7d6e0ecd"
       } ],
       "input_connections" : { },
       "label" : "sequence_reads_list_paired",
@@ -705,6 +708,6 @@
     }
   },
   "tags" : [ ],
-  "uuid" : "c7402f2d-9fbc-4dde-b0cd-324edd2a82fe",
+  "uuid" : "024e1688-8ba6-444c-9e78-43da6dac22c8",
   "version" : 1
 }
