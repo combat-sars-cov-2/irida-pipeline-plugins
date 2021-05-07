@@ -206,6 +206,57 @@
       "content_id" : "toolshed.g2.bx.psu.edu/repos/iuc/qualimap_bamqc/qualimap_bamqc/2.2.2d+galaxy1",
       "tool_id" : "toolshed.g2.bx.psu.edu/repos/iuc/qualimap_bamqc/qualimap_bamqc/2.2.2d+galaxy1"
     },
+    "14" : {
+      "workflow_outputs" : [ {
+        "label" : null,
+        "output_name" : "output1",
+        "uuid" : "7bb5d13a-d960-4740-a944-391e1d2ff4c0"
+      } ],
+      "input_connections" : {
+        "input1" : {
+          "id" : 13,
+          "output_name" : "output"
+        }
+      },
+      "label" : null,
+      "id" : 14,
+      "tool_state" : "{\"alignment\": \"false\", \"db\": {\"source\": \"download\", \"__current_case__\": 0}, \"input1\": {\"__class__\": \"RuntimeValue\"}, \"max_ambig\": \"0.5\", \"min_length\": \"10000\", \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+      "errors" : null,
+      "position" : {
+        "left" : 2442,
+        "top" : 225
+      },
+      "name" : "Pangolin",
+      "uuid" : "5c18ea6e-777d-4572-9182-25fc2f41865e",
+      "outputs" : [ {
+        "name" : "output1",
+        "type" : "tabular"
+      } ],
+      "tool_shed_repository" : {
+        "changeset_revision" : "b6abccb1f25b",
+        "name" : "pangolin",
+        "owner" : "iuc",
+        "tool_shed" : "toolshed.g2.bx.psu.edu"
+      },
+      "type" : "tool",
+      "tool_version" : "2.3.8",
+      "annotation" : "",
+      "inputs" : [ {
+        "description" : "runtime parameter for tool Pangolin",
+        "name" : "input1"
+      } ],
+      "post_job_actions" : {
+        "RenameDatasetActionoutput1" : {
+          "action_arguments" : {
+            "newname" : "pangolin.csv"
+        },
+          "action_type" : "RenameDatasetAction",
+          "output_name" : "output1"
+        }
+      },
+      "content_id" : "toolshed.g2.bx.psu.edu/repos/iuc/pangolin/pangolin/2.3.8",
+      "tool_id" : "toolshed.g2.bx.psu.edu/repos/iuc/pangolin/pangolin/2.3.8"
+    },
     "7" : {
       "workflow_outputs" : [ ],
       "input_connections" : {
