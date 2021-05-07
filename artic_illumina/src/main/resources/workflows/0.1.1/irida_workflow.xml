@@ -205,7 +205,7 @@
     <output name="qc.csv" fileName="qc.csv"/>
     <output name="qc.png" fileName="qc.png"/>
     <output name="qc.json" fileName="qc.json"/>
-    <output name="qc.json" fileName="qc.json"/>
+    <output name="pangolin.csv" fileName="pangolin.csv"/>
   </outputs>
   <toolRepositories>
     <repository>
