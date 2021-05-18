@@ -196,6 +196,9 @@
     <parameter name="pangolin-14-db.source" defaultValue="download">
       <toolParameter toolId="5c18ea6e-777d-4572-9182-25fc2f41865e" parameterName="db.source"/>
     </parameter>
+    <parameter name="nextclade-15-adv.advanced_options" defaultValue="no">
+      <toolParameter toolId="b0cf3b55-c761-4963-9e57-55c983003034" parameterName="adv.advanced_options"/>
+    </parameter>
   </parameters>
   <outputs>
     <output name="ivar_variants.csv" fileName="ivar_variants.csv"/>
@@ -206,6 +209,7 @@
     <output name="qc.png" fileName="qc.png"/>
     <output name="qc.json" fileName="qc.json"/>
     <output name="pangolin.csv" fileName="pangolin.csv"/>
+    <output name="nextclade.tsv" fileName="nextclade.tsv"/>
   </outputs>
   <toolRepositories>
     <repository>
@@ -261,6 +265,12 @@
       <owner>devteam</owner>
       <url>https://toolshed.g2.bx.psu.edu</url>
       <revision>3fe632431b68</revision>
+    </repository>
+    <repository>
+      <name>nextclade</name>
+      <owner>iuc</owner>
+      <url>https://toolshed.g2.bx.psu.edu</url>
+      <revision>0f20ed06ed6c</revision>
     </repository>
     <repository>
       <name>fastp</name>

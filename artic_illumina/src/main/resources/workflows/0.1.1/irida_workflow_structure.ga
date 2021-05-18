@@ -257,6 +257,57 @@
       "content_id" : "toolshed.g2.bx.psu.edu/repos/iuc/pangolin/pangolin/2.3.8",
       "tool_id" : "toolshed.g2.bx.psu.edu/repos/iuc/pangolin/pangolin/2.3.8"
     },
+    "15" : {
+      "workflow_outputs" : [ {
+        "label" : null,
+        "output_name" : "report_tsv",
+        "uuid" : "8addc0eb-4029-40ee-aa33-cf5b50ce4c7c"
+      } ],
+      "input_connections" : {
+        "input_fasta" : {
+          "id" : 13,
+          "output_name" : "output"
+        }
+      },
+      "label" : null,
+      "id" : 15,
+      "tool_state" : "{\"adv\": {\"advanced_options\": \"no\", \"__current_case__\": 1}, \"input_fasta\": {\"__class__\": \"RuntimeValue\"}, \"outputs\": \"report_tsv\", \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+      "errors" : null,
+      "position" : {
+        "left" : 2488,
+        "top" : 432
+      },
+      "name" : "Nextclade",
+      "uuid" : "b0cf3b55-c761-4963-9e57-55c983003034",
+      "outputs" : [ {
+        "name" : "report_tsv",
+        "type" : "tabular"
+      } ],
+      "tool_shed_repository" : {
+        "changeset_revision" : "0f20ed06ed6c",
+        "name" : "nextclade",
+        "owner" : "iuc",
+        "tool_shed" : "toolshed.g2.bx.psu.edu"
+      },
+      "type" : "tool",
+      "tool_version" : "0.14.2+galaxy1",
+      "annotation" : "",
+      "inputs" : [ {
+        "description" : "runtime parameter for tool Nextclade",
+        "name" : "input_fasta"
+      } ],
+      "post_job_actions" : {
+        "RenameDatasetActionreport_tsv" : {
+          "action_arguments" : {
+            "newname" : "nextclade.tsv"
+          },
+          "action_type" : "RenameDatasetAction",
+          "output_name" : "report_tsv"
+        }
+      },
+      "content_id" : "toolshed.g2.bx.psu.edu/repos/iuc/nextclade/nextclade/0.14.2+galaxy1",
+      "tool_id" : "toolshed.g2.bx.psu.edu/repos/iuc/nextclade/nextclade/0.14.2+galaxy1"
+    },
     "7" : {
       "workflow_outputs" : [ ],
       "input_connections" : {
