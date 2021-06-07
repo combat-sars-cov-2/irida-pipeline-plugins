@@ -41,6 +41,45 @@ class QCReport {
     public String qc_pass;
 }
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+class AminoAcid {
+	public String sample_name;
+    public float pct_N_bases;
+    public float pct_covered_bases;
+    public float num_aligned_reads;
+    public String fasta;
+	public String bam;
+    public String qc_pass;
+
+	// N:A220V,ORF1a:L3711F,ORF1b:P314L,S:L18F,S:D215H,S:A222V,S:D614G
+}
+
+
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+class Variants {
+	public String sample_name;
+    public float pct_N_bases;
+    public float pct_covered_bases;
+    public float num_aligned_reads;
+    public String fasta;
+	public String bam;
+    public String qc_pass;
+
+	// C241T,T445C,C3037T,C6286T,C11396T,C14408T,C21614T,G22205C,C22227T,A23403G,C26801G,C27944T,C28932T,G29645T
+}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+class Lineage {
+	public String sample_name;
+}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+class Clade {
+	public String sample_name;
+}
+
+
 class MetadataValue {
     public String header;
     public String value;
