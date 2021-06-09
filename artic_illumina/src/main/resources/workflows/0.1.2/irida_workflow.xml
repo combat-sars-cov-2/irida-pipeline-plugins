@@ -193,7 +193,7 @@
     <parameter name="text_processing-13-code" defaultValue="/^&gt;/s/Consensus_(.*)_threshold_.*/\1/">
       <toolParameter toolId="e18c3cbb-d092-4c23-ae50-69e90f36ea67" parameterName="code" label="AWK Program" type="text"/>
     </parameter>
-    <parameter name="pangolin-14-db.source" defaultValue="download">
+    <parameter name="pangolin-14-db.source" defaultValue="default">
       <toolParameter toolId="5c18ea6e-777d-4572-9182-25fc2f41865e" parameterName="db.source"/>
     </parameter>
     <parameter name="nextclade-15-adv.advanced_options" defaultValue="no">
