@@ -29,54 +29,27 @@ import ca.corefacility.bioinformatics.irida.service.workflow.IridaWorkflowsServi
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class QCReport {
-	public String sample_name;
     public float pct_N_bases;
     public float pct_covered_bases;
     public float num_aligned_reads;
-    public String fasta;
-	public String bam;
-    public String qc_pass;
+	public float longest_no_N_run;
 }
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-class AminoAcid {
-	public String sample_name;
-    public float pct_N_bases;
-    public float pct_covered_bases;
-    public float num_aligned_reads;
-    public String fasta;
-	public String bam;
-    public String qc_pass;
-
-	// N:A220V,ORF1a:L3711F,ORF1b:P314L,S:L18F,S:D215H,S:A222V,S:D614G
+class NextClade {
+	public String aaSubstitutions;
+	public String substitutions;
+	public String clade;
 }
 
-
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-class Variants {
-	public String sample_name;
-    public float pct_N_bases;
-    public float pct_covered_bases;
-    public float num_aligned_reads;
-    public String fasta;
-	public String bam;
-    public String qc_pass;
-
-	// C241T,T445C,C3037T,C6286T,C11396T,C14408T,C21614T,G22205C,C22227T,A23403G,C26801G,C27944T,C28932T,G29645T
-}
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-class Lineage {
-	public String sample_name;
-}
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-class Clade {
-	public String sample_name;
+class Pangolin {
+	public String lineage; //B.1.177
 }
 
 
@@ -103,6 +76,9 @@ public class ArticIlluminaPluginUpdater implements AnalysisSampleUpdater {
 	//private static final Logger logger = LoggerFactory.getLogger(ArticIlluminaPluginUpdater.class);
 
 	private static final String QC_FILE = "qc.json";
+	private static final String NEXT_CLADE_FILE = "nextclade.tsv";
+	private static final String PANGOLIN_FILE = "pangolin.csv";
+
 
 	private final MetadataTemplateService metadataTemplateService;
 	private final SampleService sampleService;
@@ -150,7 +126,11 @@ public class ArticIlluminaPluginUpdater implements AnalysisSampleUpdater {
 
 		// extracts paths to the analysis result files
 		AnalysisOutputFile qcFile = analysis.getAnalysis().getAnalysisOutputFile(QC_FILE);
-		Path filePath = qcFile.getFile();
+		AnalysisOutputFile nextCladeFile = analysis.getAnalysis().getAnalysisOutputFile(NEXT_CLADE_FILE);
+		AnalysisOutputFile pangolinFile = analysis.getAnalysis().getAnalysisOutputFile(PANGOLIN_FILE);
+		Path qcFilePath = qcFile.getFile();
+		Path nextCladeFilePath = nextCladeFile.getFile();
+		Path pangolinFilePath = pangolinFile.getFile();
 
 		try {
 			Map<String, MetadataEntry> metadataEntries = new HashMap<>();
@@ -160,36 +140,74 @@ public class ArticIlluminaPluginUpdater implements AnalysisSampleUpdater {
 			String workflowVersion = iridaWorkflow.getWorkflowDescription().getVersion();
 			String workflowName = iridaWorkflow.getWorkflowDescription().getName();
 
-			//Read the CSV file from qc_uk output
-			@SuppressWarnings("resource")
-			String jsonFile = new Scanner(new BufferedReader(new FileReader(filePath.toFile()))).useDelimiter("\\Z").next();
+			// Metadata: ETL file list (Hashmap)
+			HashMap<Path, String[]> etlFiles = new HashMap<Path, String[]>();
+			etlFiles.put(qcFilePath, new String[] {"pct_N_bases", "pct_covered_bases", "num_aligned_reads", "longest_no_N_run"});
+			etlFiles.put(nextCladeFilePath, new String [] {"aa_substitutions", "variants", "clades"});
+			etlFiles.put(pangolinFilePath, new String [] {"lineage"});
 
-			// map the results into a Map
-			ObjectMapper mapper = new ObjectMapper();
-			QCReport qcResults = mapper.readValue(jsonFile, QCReport.class);
+			CsvMapper m = new CsvMapper();
+			// load the metadata
+			for (Path i : etlFiles.keySet()) {
+				@SuppressWarnings("resource")
+				// map the results into a Map
+				ObjectMapper mapper = new ObjectMapper();
+				Map<String, MetadataValue> metaFields = new HashMap<>();
+				switch(i.getFileName().toString())
+				{
+					case "qc.json":
+						// QC:  Read the outputfile
+						String scannedFile = new Scanner(new BufferedReader(new FileReader(i.toFile()))).useDelimiter("\\Z").next();
+						QCReport qc_results = mapper.readValue(scannedFile, QCReport.class);
+						metaFields = Map.ofEntries(
+								entry("pct_N_bases", new MetadataValue("Percentage N Bases", Float.toString(qc_results.pct_N_bases))),
+								entry("pct_covered_bases", new MetadataValue("Percentage Covered Bases", Float.toString(qc_results.pct_covered_bases))),
+								entry("num_aligned_reads", new MetadataValue("Number of Aligned Reads", Float.toString(qc_results.num_aligned_reads))),
+								entry("longest_no_N_run", new MetadataValue("Longest of Runs", Float.toString(qc_results.longest_no_N_run))));
+						break;
+					case "nextclade.tsv":
+						CsvSchema n_schema = m.schemaFor(NextClade.class).withColumnSeparator('\t');
+						MappingIterator<Map<String, String>> tsv_results = mapper
+								.readerForMapOf(NextClade.class)
+								.with(n_schema)
+								.readValues(i.toFile());
+						Map<String, String> tsv_row = tsv_results.nextValue();
+						metaFields = Map.ofEntries(
+								entry("aaSubstitutions", new MetadataValue("Amino Acids Substitutions", tsv_row.get("aaSubstitutions"))),
+								entry("substitutions", new MetadataValue("Variants", tsv_row.get("substitutions"))),
+								entry("clades", new MetadataValue("Clades", tsv_row.get("clades"))));
+						break;
+					case "pangolin.csv":
+						CsvSchema p_schema = m.schemaFor(Pangolin.class).withColumnSeparator('\t');
+						/*CsvSchema schema = CsvSchema.builder()
+								.addColumn("lineage")
+								.build();*/
+						MappingIterator<Map<String, String>> csv_results = mapper
+								.readerForMapOf(Pangolin.class)
+								.with(p_schema)
+								.readValues(i.toFile());
+						Map<String, String> csv_row = csv_results.nextValue();
+						metaFields = Map.ofEntries(
+								entry("lineage", new MetadataValue("Lineage", csv_row.get("lineage"))));
+						break;
+				}
+				// @formatter:on */
+				metaFields.put("workflow_name", new MetadataValue("Workflow Name", workflowName));
+				metaFields.put("workflow_version", new MetadataValue("Workflow Version", workflowVersion));
 
-			// @formatter:off/* 
-			//Map<String, MetadataValue> qcFields = new HashMap<>(Map.ofEntries());
-			Map<String, MetadataValue> qcFields = new HashMap<>(Map.ofEntries(
-			 	entry("pct_N_bases", new MetadataValue("Percentage N Bases", Float.toString(qcResults.pct_N_bases))),
-			 	entry("pct_covered_bases", new MetadataValue("Percentage Covered Bases", Float.toString(qcResults.pct_covered_bases))),
-			 	entry("num_aligned_reads", new MetadataValue("Number of Aligned Reads", Float.toString(qcResults.num_aligned_reads))),
-			 	entry("qc_pass", new MetadataValue("Quality Control Pass", qcResults.qc_pass))));
-			// @formatter:on */
-			qcFields.put("workflow_name", new MetadataValue("Workflow Name", workflowName));
-			qcFields.put("workflow_version", new MetadataValue("Workflow Version", workflowVersion));
-				
-			qcFields.entrySet().forEach(entry -> {
-				PipelineProvidedMetadataEntry metadataEntry =
-					new PipelineProvidedMetadataEntry(entry.getValue().value, "text", analysis);
-				metadataEntries.put(entry.getValue().header, metadataEntry);
-			});
-			Set<MetadataEntry> metadataSet = metadataTemplateService.convertMetadataStringsToSet(metadataEntries);
-			samples.forEach(s -> {
-				sampleService.mergeSampleMetadata(s, metadataSet);
-			});
+				metaFields.entrySet().forEach(entry -> {
+					PipelineProvidedMetadataEntry metadataEntry =
+							new PipelineProvidedMetadataEntry(entry.getValue().value, "text", analysis);
+					metadataEntries.put(entry.getValue().header, metadataEntry);
+				});
+
+				Set<MetadataEntry> metadataSet = metadataTemplateService.convertMetadataStringsToSet(metadataEntries);
+				samples.forEach(s -> {
+					sampleService.mergeSampleMetadata(s, metadataSet);
+				});
+			}
 		} catch (JsonProcessingException e) {
-			throw new PostProcessingException("Error parsing CSV from qc.csv results", e);
+			throw new PostProcessingException("Error parsing JSON from results", e);
 		} catch (IOException e) {
 			throw new PostProcessingException("Error parsing hash file", e);
 		} catch (IridaWorkflowNotFoundException e) {
