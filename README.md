@@ -7,7 +7,8 @@ This project contains [IRIDA](http://irida.ca) pipeline plugins, custom develope
 ## The List of Plugins
 
 1. artic_nanopore
-
+2. artic_illumina
+ 
 ## Installing Plugin to your local IRIDA
 
 To install any of the plugins to your local IRIDA installation, please do the following:
