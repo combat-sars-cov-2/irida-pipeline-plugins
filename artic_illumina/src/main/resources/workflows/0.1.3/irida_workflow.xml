@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <iridaWorkflow>
-  <id>f0168046-e6b5-4046-b652-adc5dc21f092</id>
+  <id>a2d4b0f4-78ab-4127-8b27-6cd3ac340772</id>
   <name>Artic_Illumina</name>
   <version>0.1.1</version>
   <analysisType>ARTICILLUMINA_PIPELINE</analysisType>
