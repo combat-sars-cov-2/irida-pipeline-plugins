@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <iridaWorkflow>
-  <id>f0168046-e6b5-4046-b652-adc5dc21f092</id>
+  <id>4f67699c-bc37-4008-847b-82b7ab7d2ee1</id>
   <name>Artic_Illumina</name>
-  <version>0.1.2</version>
+  <version>0.1.4</version>
   <analysisType>ARTICILLUMINA_PIPELINE</analysisType>
   <inputs>
     <sequenceReadsPaired>sequence_reads_list_paired</sequenceReadsPaired>
@@ -258,7 +258,7 @@
       <name>pangolin</name>
       <owner>iuc</owner>
       <url>https://toolshed.g2.bx.psu.edu</url>
-      <revision>68e94cfc9e6d</revision>
+      <revision>514a786baaa9</revision>
     </repository>
     <repository>
       <name>bwa</name>
