@@ -74,7 +74,7 @@ public class ArticIlluminaPlugin extends Plugin {
 		 */
 		@Override
 		public UUID getDefaultWorkflowUUID() {
-			return UUID.fromString("4f67699c-bc37-4008-847b-82b7ab7d2ee1");
+			return UUID.fromString("5795dc4d-fe84-4c8f-ad07-e7c8075c3dce");
 		}
 
 		/*******************************************************************************
@@ -92,7 +92,7 @@ public class ArticIlluminaPlugin extends Plugin {
 		 */
 		@Override
 		public Optional<Color> getBackgroundColor() {
-			return Optional.of(Color.decode("#4287f5"));
+			return Optional.of(Color.decode("#099a00"));
 		}
 
 		/**
