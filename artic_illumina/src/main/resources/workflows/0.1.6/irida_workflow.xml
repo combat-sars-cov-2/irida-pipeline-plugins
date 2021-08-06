@@ -2,7 +2,7 @@
 <iridaWorkflow>
   <id>ef5c0233-a55d-451c-b98d-14a6d9d5d95e</id>
   <name>Artic_Illumina</name>
-  <version>0.1.4</version>
+  <version>0.1.6</version>
   <analysisType>ARTICILLUMINA_PIPELINE</analysisType>
   <inputs>
     <sequenceReadsPaired>sequence_reads_list_paired</sequenceReadsPaired>
@@ -202,7 +202,8 @@
   </parameters>
   <outputs>
     <output name="ivar_variants.csv" fileName="ivar_variants.csv"/>
-    <output name="multiqc_output.html" fileName="multiqc_output.html"/>
+    <output name="ivar_consensus.fasta" fileName="ivar_consensus.fasta"/>
+    <output name="multiqc_output.html" fileName="multiqc_output.txt"/>
     <output name="infile" fileName="infile"/>
     <output name="qc.csv" fileName="qc.csv"/>
     <output name="qc.png" fileName="qc.png"/>
@@ -257,7 +258,7 @@
       <name>pangolin</name>
       <owner>iuc</owner>
       <url>https://toolshed.g2.bx.psu.edu</url>
-      <revision>514a786baaa9</revision>
+      <revision>7bb8726be37c</revision>
     </repository>
     <repository>
       <name>bwa</name>

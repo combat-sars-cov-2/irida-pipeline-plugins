@@ -6,7 +6,7 @@
 
 	<groupId>ca.corefacility.bioinformatics.irida.plugins</groupId>
 	<artifactId>artic_illumina</artifactId>
-	<version>0.1.5</version>
+	<version>0.1.6</version>
 
 	<!-- Please fill out these properties with information about your particular plugin -->
 	<properties>
