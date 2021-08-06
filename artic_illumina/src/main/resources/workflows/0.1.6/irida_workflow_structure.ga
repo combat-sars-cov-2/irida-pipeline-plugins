@@ -98,16 +98,25 @@
       "tool_version" : "1.8+galaxy0",
       "annotation" : "",
       "inputs" : [ ],
-      "post_job_actions" : {
-        "HideDatasetActionplots" : {
-          "action_arguments" : { },
-          "action_type" : "HideDatasetAction",
-          "output_name" : "plots"
+      "post_job_actions": {
+        "ChangeDatatypeActionhtml_report": {
+            "action_arguments": {
+                "newtype": "txt"
+            },
+            "action_type": "ChangeDatatypeAction",
+            "output_name": "html_report"
         },
-        "HideDatasetActionstats" : {
-          "action_arguments" : { },
-          "action_type" : "HideDatasetAction",
-          "output_name" : "stats"
+        "HideDatasetActionstats": {
+            "action_arguments": {},
+            "action_type": "HideDatasetAction",
+            "output_name": "stats"
+        },
+        "RenameDatasetActionhtml_report": {
+            "action_arguments": {
+                "newname": "multiqc_output.txt"
+            },
+            "action_type": "RenameDatasetAction",
+            "output_name": "html_report"
         }
       },
       "content_id" : "toolshed.g2.bx.psu.edu/repos/iuc/multiqc/multiqc/1.8+galaxy0",
@@ -233,13 +242,13 @@
         "type" : "tabular"
       } ],
       "tool_shed_repository" : {
-        "changeset_revision" : "514a786baaa9",
+        "changeset_revision" : "7bb8726be37c",
         "name" : "pangolin",
         "owner" : "iuc",
         "tool_shed" : "toolshed.g2.bx.psu.edu"
       },
       "type" : "tool",
-      "tool_version" : "2.3.8+galaxy1",
+      "tool_version" : "3.1.7+galaxy0",
       "annotation" : "",
       "inputs" : [ {
         "description" : "runtime parameter for tool Pangolin",
@@ -254,8 +263,8 @@
           "output_name" : "output1"
         }
       },
-      "content_id" : "toolshed.g2.bx.psu.edu/repos/iuc/pangolin/pangolin/2.3.8+galaxy1",
-      "tool_id" : "toolshed.g2.bx.psu.edu/repos/iuc/pangolin/pangolin/2.3.8+galaxy1"
+      "content_id" : "toolshed.g2.bx.psu.edu/repos/iuc/pangolin/pangolin/3.1.7+galaxy0",
+      "tool_id" : "toolshed.g2.bx.psu.edu/repos/iuc/pangolin/pangolin/3.1.7+galaxy0"
     },
     "15" : {
       "workflow_outputs" : [ {
@@ -684,25 +693,18 @@
       "tool_version" : "1.8+galaxy0",
       "annotation" : "",
       "inputs" : [ ],
-      "post_job_actions": {
-        "ChangeDatatypeActionhtml_report": {
-            "action_arguments": {
-                "newtype": "txt"
-            },
-            "action_type": "ChangeDatatypeAction",
-            "output_name": "html_report"
+      "post_job_actions" : {
+        "HideDatasetActionstats" : {
+          "action_arguments" : { },
+          "action_type" : "HideDatasetAction",
+          "output_name" : "stats"
         },
-        "HideDatasetActionstats": {
-            "action_arguments": {},
-            "action_type": "HideDatasetAction",
-            "output_name": "stats"
-        },
-        "RenameDatasetActionhtml_report": {
-            "action_arguments": {
-                "newname": "multiqc_output.txt"
-            },
-            "action_type": "RenameDatasetAction",
-            "output_name": "html_report"
+        "RenameDatasetActionhtml_report" : {
+          "action_arguments" : {
+            "newname" : "multiqc_output.html"
+          },
+          "action_type" : "RenameDatasetAction",
+          "output_name" : "html_report"
         }
       },
       "content_id" : "toolshed.g2.bx.psu.edu/repos/iuc/multiqc/multiqc/1.8+galaxy0",
