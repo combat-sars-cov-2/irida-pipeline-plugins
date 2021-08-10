@@ -74,7 +74,7 @@ public class ArticIlluminaPlugin extends Plugin {
 		 */
 		@Override
 		public UUID getDefaultWorkflowUUID() {
-			return UUID.fromString("5795dc4d-fe84-4c8f-ad07-e7c8075c3dce");
+			return UUID.fromString("ef5c0233-a55d-451c-b98d-14a6d9d5d95e");
 		}
 
 		/*******************************************************************************
