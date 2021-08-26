@@ -203,7 +203,7 @@
   <outputs>
     <output name="ivar_variants.csv" fileName="ivar_variants.csv"/>
     <output name="ivar_consensus.fasta" fileName="ivar_consensus.fasta"/>
-    <output name="multiqc_output.txt" fileName="multiqc_output.txt"/>
+    <!--<output name="multiqc_output.txt" fileName="multiqc_output.txt"/>-->
     <output name="multiqc_output.txt" fileName="multiqc_output.html"/>
     <output name="infile" fileName="infile"/>
     <output name="qc.csv" fileName="qc.csv"/>
