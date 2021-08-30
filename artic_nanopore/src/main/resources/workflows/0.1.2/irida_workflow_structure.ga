@@ -1,0 +1,324 @@
+{
+  "a_galaxy_workflow" : "true",
+  "annotation" : "Artic nanopore: Workflow for generating SARS-Cov2 consensus and variants from viral amplicon data. Us\nes iVar toolsuite.",
+  "format-version" : "0.1",
+  "name" : "ARTIC Nanopore (imported from uploaded file)",
+  "steps" : {
+    "0" : {
+      "workflow_outputs" : [ {
+        "label" : null,
+        "output_name" : "output",
+        "uuid" : "8a1eaea4-4f54-4263-8999-3e89c1da4cc7"
+      } ],
+      "input_connections" : { },
+      "label" : "Reads",
+      "id" : 0,
+      "tool_state" : "{\"optional\": false, \"collection_type\": \"list\"}",
+      "errors" : null,
+      "position" : {
+        "left" : 200,
+        "top" : 199.96665954589844
+      },
+      "name" : "Input dataset collection",
+      "uuid" : "bfd0eb1d-814f-4869-bccc-51c83fbf0ec2",
+      "outputs" : [ ],
+      "type" : "data_collection_input",
+      "tool_version" : null,
+      "annotation" : "",
+      "inputs" : [ {
+        "description" : "",
+        "name" : "Reads"
+      } ],
+      "content_id" : null,
+      "tool_id" : null
+    },
+    "1" : {
+      "workflow_outputs" : [ {
+        "label" : null,
+        "output_name" : "output",
+        "uuid" : "cc733228-e589-4e69-9be6-5e544673e1b2"
+      } ],
+      "input_connections" : { },
+      "label" : "reference",
+      "id" : 1,
+      "tool_state" : "{\"optional\": false}",
+      "errors" : null,
+      "position" : {
+        "left" : 200,
+        "top" : 280.98333740234375
+      },
+      "name" : "Input dataset",
+      "uuid" : "35268539-f1a9-4057-8923-cd1f3a3e335d",
+      "outputs" : [ ],
+      "type" : "data_input",
+      "tool_version" : null,
+      "annotation" : "",
+      "inputs" : [ {
+        "description" : "",
+        "name" : "reference"
+      } ],
+      "content_id" : null,
+      "tool_id" : null
+    },
+    "2" : {
+      "workflow_outputs" : [ ],
+      "input_connections" : {
+        "input_options|input_col" : {
+          "id" : 0,
+          "output_name" : "output"
+        }
+      },
+      "label" : null,
+      "id" : 2,
+      "tool_state" : "{\"MaxLength\": \"700\", \"MinLength\": \"400\", \"input_options\": {\"input_type\": \"collection\", \"__current_case__\": 0, \"input_col\": {\"__class__\": \"ConnectedValue\"}}, \"skip_quality_check\": \"false\", \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+      "errors" : null,
+      "position" : {
+        "left" : 457.3999938964844,
+        "top" : 199.96665954589844
+      },
+      "name" : "Artic Guppyplex - (Length filtering)",
+      "uuid" : "810b177a-1dd8-4354-9fe1-a3dc7ed82b0a",
+      "outputs" : [ {
+        "name" : "output1",
+        "type" : "fastq"
+      } ],
+      "tool_shed_repository" : {
+        "changeset_revision" : "fce0e2325022",
+        "name" : "artic_guppyplex",
+        "owner" : "sanbi-uwc",
+        "tool_shed" : "testtoolshed.g2.bx.psu.edu"
+      },
+      "type" : "tool",
+      "tool_version" : "0.1.0",
+      "annotation" : "",
+      "inputs" : [ ],
+      "post_job_actions" : {
+        "HideDatasetActionoutput1" : {
+          "action_arguments" : { },
+          "action_type" : "HideDatasetAction",
+          "output_name" : "output1"
+        },
+        "RenameDatasetActionoutput1" : {
+          "action_arguments" : {
+            "newname" : "guppyplex_filtered"
+          },
+          "action_type" : "RenameDatasetAction",
+          "output_name" : "output1"
+        }
+      },
+      "content_id" : "testtoolshed.g2.bx.psu.edu/repos/sanbi-uwc/artic_guppyplex/artic_guppyplex/0.1.0",
+      "tool_id" : "testtoolshed.g2.bx.psu.edu/repos/sanbi-uwc/artic_guppyplex/artic_guppyplex/0.1.0"
+    },
+    "3" : {
+      "workflow_outputs" : [ {
+        "label" : null,
+        "output_name" : "analysis_log",
+        "uuid" : "bd61744f-5d0d-4783-9a5b-3f94d807cda6"
+      }, {
+        "label" : null,
+        "output_name" : "variants_fail_vcf",
+        "uuid" : "0dd5ab8d-ceab-4223-9f17-d617c6a85df7"
+      }, {
+        "label" : null,
+        "output_name" : "variants_merged_vcf",
+        "uuid" : "86a445ea-2828-4327-82fb-4c2b3527ed2d"
+      }, {
+        "label" : null,
+        "output_name" : "alignment_trimmed",
+        "uuid" : "c436993f-6df8-4e54-b1cb-32ddb5ab051c"
+      }, {
+        "label" : null,
+        "output_name" : "variants_pass_vcf",
+        "uuid" : "147e89b9-deab-4f47-96a1-5c6de6fc4067"
+      }, {
+        "label" : null,
+        "output_name" : "coverage_mask",
+        "uuid" : "25f6b1ee-3349-43ba-825b-a12fed483843"
+      }, {
+        "label" : null,
+        "output_name" : "consensus_fasta",
+        "uuid" : "58593278-40b3-4fc5-8fe1-72057b9a4740"
+      }, {
+        "label" : null,
+        "output_name" : "alignment_report",
+        "uuid" : "453b5524-bd4e-4806-89d8-419decedfbd2"
+      } ],
+      "input_connections" : {
+        "read_file" : {
+          "id" : 2,
+          "output_name" : "output1"
+        },
+        "reference_source|reference" : {
+          "id" : 1,
+          "output_name" : "output"
+        }
+      },
+      "label" : null,
+      "id" : 3,
+      "tool_state" : "{\"__input_ext\": \"fastq\", \"bwa\": \"false\", \"chromInfo\": \"/projects/galaxy/main_galaxy1/galaxy/tool-data/shared/ucsc/chrom/?.len\", \"normalise\": \"0\", \"primer_scheme_source\": {\"primer_scheme_source_selector\": \"tool_data_table\", \"__current_case__\": 0, \"primer_scheme_bedfile\": \"SARS-CoV-2-ARTICv3\"}, \"read_file\": {\"__class__\": \"ConnectedValue\"}, \"reference_source\": {\"reference_source_selector\": \"history\", \"__current_case__\": 1, \"reference\": {\"__class__\": \"ConnectedValue\"}}, \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+      "errors" : null,
+      "position" : {
+        "left" : 714.7999877929688,
+        "top" : 199.96665954589844
+      },
+      "name" : "ARTIC minion",
+      "uuid" : "a0ddff17-c7c4-48bb-8428-6e79b8b77428",
+      "outputs" : [ {
+        "name" : "alignment_trimmed",
+        "type" : "bam"
+      }, {
+        "name" : "alignment_report",
+        "type" : "tabular"
+      }, {
+        "name" : "variants_merged_vcf",
+        "type" : "vcf_bgzip"
+      }, {
+        "name" : "variants_fail_vcf",
+        "type" : "vcf_bgzip"
+      }, {
+        "name" : "variants_pass_vcf",
+        "type" : "vcf_bgzip"
+      }, {
+        "name" : "consensus_fasta",
+        "type" : "fasta"
+      }, {
+        "name" : "coverage_mask",
+        "type" : "tabular"
+      }, {
+        "name" : "analysis_log",
+        "type" : "txt"
+      } ],
+      "tool_shed_repository" : {
+        "changeset_revision" : "a346730e5552",
+        "name" : "artic_minion",
+        "owner" : "iuc",
+        "tool_shed" : "toolshed.g2.bx.psu.edu"
+      },
+      "type" : "tool",
+      "tool_version" : "1.1.3+galaxy2",
+      "annotation" : "",
+      "inputs" : [ ],
+      "post_job_actions" : { },
+      "content_id" : "toolshed.g2.bx.psu.edu/repos/iuc/artic_minion/artic_minion/1.1.3+galaxy2",
+      "tool_id" : "toolshed.g2.bx.psu.edu/repos/iuc/artic_minion/artic_minion/1.1.3+galaxy2"
+    },
+    "4" : {
+      "workflow_outputs" : [ {
+        "label" : null,
+        "output_name" : "plot_output",
+        "uuid" : "d2d49ddd-2282-4179-a60d-60a87a44b31d"
+      } ],
+      "input_connections" : {
+        "alignment_file" : {
+          "id" : 3,
+          "output_name" : "alignment_trimmed"
+        },
+        "reference|hist_genome" : {
+          "id" : 1,
+          "output_name" : "output"
+        }
+      },
+      "label" : null,
+      "id" : 4,
+      "tool_state" : "{\"adv\": {\"disable_paired_overlap\": \"false\", \"include_contig_regex\": \"\", \"min_mapq\": \"1\", \"max_depth\": \"-1\", \"clip\": \"false\", \"min_contig_length\": \"0\", \"percentile\": \"median\", \"points\": \"false\", \"skip_contig_regex\": \"\", \"sample_filter\": {\"filter_by_sample\": \"false\", \"__current_case__\": 1}}, \"alignment_file\": {\"__class__\": \"ConnectedValue\"}, \"dimension\": \"1000x500\", \"format\": \"PNG\", \"reference\": {\"source\": \"history\", \"__current_case__\": 1, \"hist_genome\": {\"__class__\": \"ConnectedValue\"}}, \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+      "errors" : null,
+      "position" : {
+        "left" : 972.2000122070312,
+        "top" : 199.96665954589844
+      },
+      "name" : "BAM Coverage Plotter",
+      "uuid" : "ffee8466-0496-449a-874d-89f88f83b520",
+      "outputs" : [ {
+        "name" : "plot_output",
+        "type" : "png"
+      } ],
+      "tool_shed_repository" : {
+        "changeset_revision" : "ac048a34cac3",
+        "name" : "jvarkit_wgscoverageplotter",
+        "owner" : "iuc",
+        "tool_shed" : "toolshed.g2.bx.psu.edu"
+      },
+      "type" : "tool",
+      "tool_version" : "20201223+galaxy0",
+      "annotation" : "",
+      "inputs" : [ ],
+      "post_job_actions" : { },
+      "content_id" : "toolshed.g2.bx.psu.edu/repos/iuc/jvarkit_wgscoverageplotter/jvarkit_wgscoverageplotter/20201223+galaxy0",
+      "tool_id" : "toolshed.g2.bx.psu.edu/repos/iuc/jvarkit_wgscoverageplotter/jvarkit_wgscoverageplotter/20201223+galaxy0"
+    },
+    "5" : {
+      "workflow_outputs" : [ {
+        "label" : null,
+        "output_name" : "output1",
+        "uuid" : "6dea5a76-6dc4-4841-a666-03c1431598a4"
+      }, {
+        "label" : null,
+        "output_name" : "output2",
+        "uuid" : "ed3e53d8-833c-45eb-a36c-23775a2a431e"
+      }, {
+        "label" : null,
+        "output_name" : "output3",
+        "uuid" : "dd2db4f0-7200-4650-b93a-8d8f12a17a9b"
+      } ],
+      "input_connections" : {
+        "input_bam" : {
+          "id" : 3,
+          "output_name" : "alignment_trimmed"
+        },
+        "input_cons_fasta" : {
+          "id" : 3,
+          "output_name" : "consensus_fasta"
+        },
+        "input_ref" : {
+          "id" : 1,
+          "output_name" : "output"
+        }
+      },
+      "label" : null,
+      "id" : 5,
+      "tool_state" : "{\"input_bam\": {\"__class__\": \"RuntimeValue\"}, \"input_cons_fasta\": {\"__class__\": \"RuntimeValue\"}, \"input_ref\": {\"__class__\": \"RuntimeValue\"}, \"qc_type_conditional\": {\"qc_type\": \"--illumina\", \"__current_case__\": 0}, \"__page__\": null, \"__rerun_remap_job_id__\": null}",
+      "errors" : null,
+      "position" : {
+        "left" : 972.2000122070312,
+        "top" : 354.7833251953125
+      },
+      "name" : "Quality Control (COG-UK QC)",
+      "uuid" : "ca248d26-5888-4071-93bd-6df50ab92c4a",
+      "outputs" : [ {
+        "name" : "output1",
+        "type" : "csv"
+      }, {
+        "name" : "output2",
+        "type" : "json"
+      }, {
+        "name" : "output3",
+        "type" : "png"
+      } ],
+      "tool_shed_repository" : {
+        "changeset_revision" : "6bdec8c62aec",
+        "name" : "qc",
+        "owner" : "sanbi-uwc",
+        "tool_shed" : "testtoolshed.g2.bx.psu.edu"
+      },
+      "type" : "tool",
+      "tool_version" : "0.1.1",
+      "annotation" : "",
+      "inputs" : [ {
+        "description" : "runtime parameter for tool Quality Control (COG-UK QC)",
+        "name" : "input_bam"
+      }, {
+        "description" : "runtime parameter for tool Quality Control (COG-UK QC)",
+        "name" : "input_cons_fasta"
+      }, {
+        "description" : "runtime parameter for tool Quality Control (COG-UK QC)",
+        "name" : "input_ref"
+      } ],
+      "post_job_actions" : { },
+      "content_id" : "testtoolshed.g2.bx.psu.edu/repos/sanbi-uwc/qc/qc_cog_uk/0.1.1",
+      "tool_id" : "testtoolshed.g2.bx.psu.edu/repos/sanbi-uwc/qc/qc_cog_uk/0.1.1"
+    }
+  },
+  "tags" : [ ],
+  "uuid" : "5168ace8-f5c4-44dd-b8ef-7f2a75b83785",
+  "version" : 1
+}
