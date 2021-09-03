@@ -4,16 +4,23 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 
-import com.google.common.collect.ImmutableMap;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Splitter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.corefacility.bioinformatics.irida.exceptions.IridaWorkflowNotFoundException;
 import ca.corefacility.bioinformatics.irida.exceptions.PostProcessingException;
-import ca.corefacility.bioinformatics.irida.model.sample.MetadataTemplateField;
 import ca.corefacility.bioinformatics.irida.model.sample.Sample;
 import ca.corefacility.bioinformatics.irida.model.sample.metadata.MetadataEntry;
 import ca.corefacility.bioinformatics.irida.model.sample.metadata.PipelineProvidedMetadataEntry;
@@ -26,6 +33,28 @@ import ca.corefacility.bioinformatics.irida.service.sample.MetadataTemplateServi
 import ca.corefacility.bioinformatics.irida.service.sample.SampleService;
 import ca.corefacility.bioinformatics.irida.service.workflow.IridaWorkflowsService;
 
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+class QCReport {
+    public float pct_N_bases;
+    public float pct_covered_bases;
+    public float num_aligned_reads;
+	public float longest_no_N_run;
+}
+
+
+class MetadataValue {
+    public String header;
+    public String value;
+
+    MetadataValue(String header, String value) {
+        this.header = header;
+        this.value = value;	
+    }
+
+}
+
+
 /**
  * This implements a class used to perform post-processing on the analysis
  * pipeline results to extract information to write into the IRIDA metadata
@@ -34,10 +63,18 @@ import ca.corefacility.bioinformatics.irida.service.workflow.IridaWorkflowsServi
  * or the README.md file in this project for more details.
  */
 public class ArticNanoporePluginUpdater implements AnalysisSampleUpdater {
+	private static final Logger logger = LoggerFactory.getLogger( ArticNanoporePluginUpdater.class);
 
+	private static final String QC_FILE = "qc.json";
+	private static final String NEXT_CLADE_FILE = "nextclade.tsv";
+	private static final String PANGOLIN_FILE = "pangolin.csv";
+
+	private static final Splitter SPLITTER = Splitter.on('\t');
+	
 	private final MetadataTemplateService metadataTemplateService;
 	private final SampleService sampleService;
 	private final IridaWorkflowsService iridaWorkflowsService;
+
 
 	/**
 	 * Builds a new {@link ArticNanoporePluginUpdater} with the given services.
@@ -52,6 +89,167 @@ public class ArticNanoporePluginUpdater implements AnalysisSampleUpdater {
 		this.sampleService = sampleService;
 		this.iridaWorkflowsService = iridaWorkflowsService;
 	}
+	
+	/**
+	 * Parses a line of the results file and gets a Map linking the column to the
+	 * value in the line. (e.g., "N50 value" => "100").
+	 * 
+	 * @param columnNames        A List of names of the columns in the results file.
+	 * @param line               The line to parse.
+	 * @param singleColumnPrefix A prefix for a special case in the staramr results
+	 *                           where the column prefix is constant but the suffix
+	 *                           changes. Set to null to ignore.
+	 * @param resultsFile        The specific file being parsed (for error
+	 *                           messages).
+	 * @param analysis           The analysis submission being parsed (for error
+	 *                           messages).
+	 * @return A Map linking the column to the value for the line.
+	 * @throws PostProcessingException If there was an error parsing the results.
+	 */
+	
+	private Map<String, String> getDataMapForLine(List<String> columnNames, String line,
+			Path resultsFile, AnalysisSubmission analysis) throws PostProcessingException {
+		Map<String, String> dataMap = new HashMap<>();
+
+		List<String> values = SPLITTER.splitToList(line);
+
+		if (columnNames.size() != values.size()) {
+			throw new PostProcessingException("Mismatch in number of column names [" + columnNames.size()
+					+ "] and number of files [" + values.size() + "] in results file [" + resultsFile + "]");
+		}
+
+		for (int i = 0; i < columnNames.size(); i++) {
+			dataMap.put(columnNames.get(i), values.get(i));
+		}
+		return dataMap;
+	}
+	
+	/**
+	 * Gets the qc results from the given output file.
+	 * 
+	 * @param qcFilePath The QC output file containing the results.
+	 * @param analysis        The {@link AnalysisSubmission} containing the results.
+	 * @return A {@link Map} storing the results from staramr, keyed by the metadata
+	 *         field name.
+	 * @throws IOException             If there was an issue reading the file.
+	 * @throws PostProcessingException If there was an issue parsing the file.
+	 */
+	private Map<String, PipelineProvidedMetadataEntry> getQCResults(Path qcFilePath,
+			AnalysisSubmission analysis) throws IOException, PostProcessingException {
+		
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String, PipelineProvidedMetadataEntry> results = new HashMap<>();
+		
+		@SuppressWarnings("resource")
+		String scannedFile = new Scanner(new BufferedReader(new FileReader(qcFilePath.toFile()))).useDelimiter("\\Z").next();
+		QCReport qc_results = mapper.readValue(scannedFile, QCReport.class);
+
+		results.put("pct_N_bases", new PipelineProvidedMetadataEntry(Float.toString(qc_results.pct_N_bases), "Percentage N Bases", analysis));
+		results.put("pct_covered_bases", new PipelineProvidedMetadataEntry(Float.toString(qc_results.pct_covered_bases), "Percentage Covered Bases", analysis));
+		results.put("num_aligned_reads", new PipelineProvidedMetadataEntry(Float.toString(qc_results.num_aligned_reads), "Number of Aligned Reads", analysis));
+		results.put("longest_no_N_run", new PipelineProvidedMetadataEntry(Float.toString(qc_results.longest_no_N_run), "Longest of Runs", analysis));
+		
+		return results;
+	}
+
+	/**
+	 * Gets the nextclade results from the given output file.
+	 * 
+	 * @param nextcladeFilePath The nextclade output file containing the results.
+	 * @param analysis        The {@link AnalysisSubmission} containing the results.
+	 * @return A {@link Map} storing the results from staramr, keyed by the metadata
+	 *         field name.
+	 * @throws IOException             If there was an issue reading the file.
+	 * @throws PostProcessingException If there was an issue parsing the file.
+	 */
+	private Map<String, PipelineProvidedMetadataEntry> getNextCladeResults(Path nextcladeFilePath,
+			AnalysisSubmission analysis) throws IOException, PostProcessingException {
+		final int MIN_TOKENS = 2;
+
+		Map<String, PipelineProvidedMetadataEntry> results = new HashMap<>();
+		Map<String, String> dataMap;
+
+		@SuppressWarnings("resource")
+		BufferedReader reader = new BufferedReader(new FileReader(nextcladeFilePath.toFile()));
+		String line = reader.readLine();
+		List<String> columnNames = SPLITTER.splitToList(line);
+		
+		if (columnNames.size() < MIN_TOKENS) {
+			throw new PostProcessingException("Invalid number of columns in nextclade results file [" + nextcladeFilePath
+					+ "], expected at least [" + MIN_TOKENS + "] got [" + columnNames.size() + "]");
+		}
+
+		line = reader.readLine();
+		if (line == null || line.length() == 0) {
+			dataMap = new HashMap<>();
+			logger.info(
+					"Got empty results for nextclade file [" + nextcladeFilePath + "] for analysis submission " + analysis);
+		} else {
+			dataMap = getDataMapForLine(columnNames, line, nextcladeFilePath, analysis);
+		}
+		results.put("aaSubstitutions", new PipelineProvidedMetadataEntry(dataMap.get("aaSubstitutions"), "Amino Acids Substitutions", analysis));
+		results.put("substitutions", new PipelineProvidedMetadataEntry(dataMap.get("substitutions"), "Variants", analysis));
+		results.put("clade", new PipelineProvidedMetadataEntry(dataMap.get("clade"), "Clades", analysis));
+		
+		line = reader.readLine();
+		
+		if (line == null) {
+			return results;
+		} else {
+			throw new PostProcessingException("Invalid number of results in nextclade results file [" + nextcladeFilePath
+					+ "], expected only one line of results but got multiple lines");
+		}
+	}
+
+/**
+	 * Gets the pangolin results from the given output file.
+	 * 
+	 * @param pangolinFilePath The nextclade output file containing the results.
+	 * @param analysis        The {@link AnalysisSubmission} containing the results.
+	 * @return A {@link Map} storing the results from staramr, keyed by the metadata
+	 *         field name.
+	 * @throws IOException             If there was an issue reading the file.
+	 * @throws PostProcessingException If there was an issue parsing the file.
+	 */
+	private Map<String, PipelineProvidedMetadataEntry> getPangolinResults(Path pangolinFilePath,
+			AnalysisSubmission analysis) throws IOException, PostProcessingException {
+		final int MIN_TOKENS = 2;
+
+		Map<String, PipelineProvidedMetadataEntry> results = new HashMap<>();
+		Map<String, String> dataMap;
+
+		@SuppressWarnings("resource")
+		BufferedReader reader = new BufferedReader(new FileReader(pangolinFilePath.toFile()));
+		String line = reader.readLine();
+		List<String> columnNames = SPLITTER.splitToList(line);
+		
+		if (columnNames.size() < MIN_TOKENS) {
+			throw new PostProcessingException("Invalid number of columns in pangolin results file [" + pangolinFilePath
+					+ "], expected at least [" + MIN_TOKENS + "] got [" + columnNames.size() + "]");
+		}
+
+		line = reader.readLine();
+		if (line == null || line.length() == 0) {
+			dataMap = new HashMap<>();
+			logger.info(
+					"Got empty results for pangolin file [" + pangolinFilePath + "] for analysis submission " + analysis);
+		} else {
+			dataMap = getDataMapForLine(columnNames, line, pangolinFilePath, analysis);
+		}
+		logger.debug("# DataMap: " + dataMap);
+		results.put("lineage", new PipelineProvidedMetadataEntry(dataMap.get("lineage"), "Lineage", analysis));
+		logger.debug("# Results: " + results);
+
+		line = reader.readLine();
+		
+		if (line == null) {
+			return results;
+		} else {
+			throw new PostProcessingException("Invalid number of results in nextclade results file [" + pangolinFilePath
+					+ "], expected only one line of results but got multiple lines");
+		}
+	}
+
 
 	/**
 	 * Code to perform the actual update of the {@link Sample}s passed in the
@@ -80,136 +278,54 @@ public class ArticNanoporePluginUpdater implements AnalysisSampleUpdater {
 		final Sample sample = samples.iterator().next();
 
 		// extracts paths to the analysis result files
-		AnalysisOutputFile hashAnalysisFile = analysis.getAnalysis().getAnalysisOutputFile("hash.txt");
-		Path hashFile = hashAnalysisFile.getFile();
-
-		AnalysisOutputFile readCountAnalysisFile = analysis.getAnalysis().getAnalysisOutputFile("read-count.txt");
-		Path readCountFile = readCountAnalysisFile.getFile();
-
+		AnalysisOutputFile qcFile = analysis.getAnalysis().getAnalysisOutputFile(QC_FILE);
+		AnalysisOutputFile nextCladeFile = analysis.getAnalysis().getAnalysisOutputFile(NEXT_CLADE_FILE);
+		AnalysisOutputFile pangolinFile = analysis.getAnalysis().getAnalysisOutputFile(PANGOLIN_FILE);
+		
+		Path qcFilePath = qcFile.getFile();
+		Path nextCladeFilePath = nextCladeFile.getFile();
+		Path pangolinFilePath = pangolinFile.getFile(); 
+		
+		Map<String, MetadataEntry> stringEntries = new HashMap<>();
 		try {
-			Map<String, MetadataEntry> metadataEntries = new HashMap<>();
-
-			// get information about the workflow (e.g., version and name)
 			IridaWorkflow iridaWorkflow = iridaWorkflowsService.getIridaWorkflow(analysis.getWorkflowId());
 			String workflowVersion = iridaWorkflow.getWorkflowDescription().getVersion();
-			String workflowName = iridaWorkflow.getWorkflowDescription().getName();
 
-			// gets information from the "hash.txt" output file and constructs metadata
-			// objects
-			Map<String, String> hashValues = parseHashFile(hashFile);
-			for (String hashType : hashValues.keySet()) {
-				final String hashValue = hashValues.get(hashType);
+			Map<String, PipelineProvidedMetadataEntry> qcResult = getQCResults(qcFilePath, analysis);
+			Map<String, PipelineProvidedMetadataEntry> nextcladeResult = getNextCladeResults(nextCladeFilePath, analysis);
+			Map<String, PipelineProvidedMetadataEntry> pangolinResult = getPangolinResults(pangolinFilePath, analysis);
 
-				PipelineProvidedMetadataEntry hashEntry = new PipelineProvidedMetadataEntry(hashValue, "text",
-						analysis);
+			List<Map<String, PipelineProvidedMetadataEntry>> resultsList = Arrays.asList(qcResult, nextcladeResult, pangolinResult);
+			logger.debug("# Result List" + resultsList);
 
-				// key will be string like 'ReadInfo/md5 (v0.1.0)'
-				String key = workflowName + "/" + hashType + " (v" + workflowVersion + ")";
-				metadataEntries.put(key, hashEntry);
+			for (Map<String, PipelineProvidedMetadataEntry> result : resultsList) {
+				for (String fieldName : result.keySet()) {
+					stringEntries.put(appendVersion(result.get(fieldName).getType(), workflowVersion), result.get(fieldName));
+				}
 			}
 
-			// gets read count information from "read-count.txt" file and builds metadata
-			// objects
-			Long readCount = parseReadCount(readCountFile);
-			PipelineProvidedMetadataEntry readCountEntry = new PipelineProvidedMetadataEntry(readCount.toString(),
-					"text", analysis);
-
-			// key will be string like 'ReadInfo/readCount (v0.1.0)'
-			String key = workflowName + "/readCount (v" + workflowVersion + ")";
-			metadataEntries.put(key, readCountEntry);
-
-			Set<MetadataEntry> metadataSet = metadataTemplateService.convertMetadataStringsToSet(metadataEntries);
-
-			// merges with existing sample metadata and does an update of the sample metadata
-			sampleService.mergeSampleMetadata(sample,metadataSet);
-
+			Set<MetadataEntry> metadataSet = metadataTemplateService.convertMetadataStringsToSet(stringEntries);
+			sampleService.mergeSampleMetadata(sample, metadataSet);
+			
 		} catch (IOException e) {
-			throw new PostProcessingException("Error parsing hash file", e);
+			logger.error("Got IOException", e);
+			throw new PostProcessingException("Error parsing JSON from results", e);		
 		} catch (IridaWorkflowNotFoundException e) {
-			throw new PostProcessingException("Could not find workflow for id=" + analysis.getWorkflowId(), e);
+			throw new PostProcessingException("Workflow not found, for id=" + analysis.getWorkflowId(), e);
+		} catch (Exception e) {
+			logger.error("Got Exception", e);
+			throw e;
 		}
 	}
-
 	/**
-	 * Parses out the read count from the passed file.
+	 * Appends the name and version together for a metadata field name.
 	 * 
-	 * @param readCountFile The file containing the read count. The file contents
-	 *                      should look like (representing 10 reads):
-	 * 
-	 *                      <pre>
-	 *                      10
-	 *                      </pre>
-	 * 
-	 * @return A {@link Long} containing the read count.
-	 * @throws IOException If there was an error reading the file.
+	 * @param name    The name.
+	 * @param version The version.
+	 * @return The appended name and version.
 	 */
-	private Long parseReadCount(Path readCountFile) throws IOException {
-		BufferedReader readCountReader = new BufferedReader(new FileReader(readCountFile.toFile()));
-		Long readCount = null;
-
-		try {
-			String line = readCountReader.readLine();
-			readCount = Long.parseLong(line);
-		} finally {
-			readCountReader.close();
-		}
-
-		return readCount;
-	}
-
-	/**
-	 * Parses out values from the hash file into a {@link Map} linking 'hashType' to
-	 * 'hashValue'.
-	 * 
-	 * @param hashFile The {@link Path} to the file containing the hash values from
-	 *                 the pipeline. This file should contain contents like:
-	 * 
-	 *                 <pre>
-	 * #md5                                sha1
-	 * d54d78010cf8eeaa76c46646846be4f2    5908a485e47f870d3f9d72ff1e55796512047f00
-	 *                 </pre>
-	 * 
-	 * @return A {@link Map} linking 'hashType' to 'hashValue'.
-	 * @throws IOException             If there was an error reading the file.
-	 * @throws PostProcessingException If there was an error parsing the file.
-	 */
-	private Map<String, String> parseHashFile(Path hashFile) throws IOException, PostProcessingException {
-		Map<String, String> hashTypeValues = new HashMap<>();
-
-		BufferedReader hashReader = new BufferedReader(new FileReader(hashFile.toFile()));
-
-		try {
-			String headerLine = hashReader.readLine();
-
-			if (!headerLine.startsWith("#")) {
-				throw new PostProcessingException("Missing '#' in header of file " + hashFile);
-			} else {
-				// strip off '#' prefix
-				headerLine = headerLine.substring(1);
-			}
-
-			String[] hashTypes = headerLine.split("\t");
-
-			String hashValuesLine = hashReader.readLine();
-			String[] hashValues = hashValuesLine.split("\t");
-
-			if (hashTypes.length != hashValues.length) {
-				throw new PostProcessingException("Unmatched fields in header and values from file " + hashFile);
-			}
-
-			for (int i = 0; i < hashTypes.length; i++) {
-				hashTypeValues.put(hashTypes[i], hashValues[i]);
-			}
-
-			if (hashReader.readLine() != null) {
-				throw new PostProcessingException("Too many lines in file " + hashFile);
-			}
-		} finally {
-			// make sure to close, even in cases where an exception is thrown
-			hashReader.close();
-		}
-
-		return hashTypeValues;
+	private String appendVersion(String name, String version) {
+		return name + " / " + version;
 	}
 
 	/**

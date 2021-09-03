@@ -69,6 +69,7 @@
   </parameters>
   <outputs>
     <output name="guppyplex_filtered" fileName="guppyplex_filtered"/>
+    <output name="alignment_report" fileName="alignment_report"/>
   </outputs>
   <toolRepositories>
     <repository>
