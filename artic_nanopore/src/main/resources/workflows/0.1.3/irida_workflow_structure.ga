@@ -101,7 +101,7 @@
       "name" : "ARTIC guppyplex",
       "uuid" : "a117f2fd-0316-4751-9583-c71afa0f73f0",
       "outputs" : [ {
-        "name" : "artic_guppylex.fastq",
+        "name" : "output1",
         "type" : "fastq"
       } ],
       "tool_shed_repository" : {
@@ -117,7 +117,15 @@
         "description" : "runtime parameter for tool ARTIC guppyplex",
         "name" : "input"
       } ],
-      "post_job_actions" : { },
+      "post_job_actions" : {
+        "RenameDatasetActionoutput1" : {
+          "action_arguments" : {
+            "newname" : "artic_guppyplex.fastq"
+          },
+          "action_type" : "RenameDatasetAction",
+          "output_name" : "output1"
+        }
+      },
       "content_id" : "toolshed.g2.bx.psu.edu/repos/iuc/artic_guppyplex/artic_guppyplex/1.2.1+galaxy0",
       "tool_id" : "toolshed.g2.bx.psu.edu/repos/iuc/artic_guppyplex/artic_guppyplex/1.2.1+galaxy0"
     },
@@ -222,7 +230,29 @@
         "description" : "runtime parameter for tool ARTIC minion",
         "name" : "reference_source"
       } ],
-      "post_job_actions" : { },
+      "post_job_actions" : {
+        "RenameDatasetActionconsensus_fasta" : {
+          "action_arguments" : {
+            "newname" : "consensus_fasta.fasta"
+          },
+          "action_type" : "RenameDatasetAction",
+          "output_name" : "consensus_fasta"
+        },
+        "RenameDatasetActionalignment_report" : {
+          "action_arguments" : {
+            "newname" : "alignment_report.tsv"
+          },
+          "action_type" : "RenameDatasetAction",
+          "output_name" : "alignment_report"
+        },
+        "RenameDatasetActioncoverage_mask" : {
+          "action_arguments" : {
+            "newname" : "coverage_mask.tsv"
+          },
+          "action_type" : "RenameDatasetAction",
+          "output_name" : "coverage_mask"
+        }
+      },
       "content_id" : "toolshed.g2.bx.psu.edu/repos/iuc/artic_minion/artic_minion/1.2.1+galaxy0",
       "tool_id" : "toolshed.g2.bx.psu.edu/repos/iuc/artic_minion/artic_minion/1.2.1+galaxy0"
     },
@@ -271,13 +301,13 @@
       "name" : "Quality Control (COG-UK QC)",
       "uuid" : "ca248d26-5888-4071-93bd-6df50ab92c4a",
       "outputs" : [ {
-        "name" : "qc.csv",
+        "name" : "output1",
         "type" : "csv"
       }, {
-        "name" : "qc.json",
+        "name" : "output2",
         "type" : "json"
       }, {
-        "name" : "qc.png",
+        "name" : "output3",
         "type" : "png"
       } ],
       "tool_shed_repository" : {
@@ -290,7 +320,29 @@
       "tool_version" : "0.1.1",
       "annotation" : "",
       "inputs" : [ ],
-      "post_job_actions" : { },
+      "post_job_actions" : {
+        "RenameDatasetActionoutput1" : {
+          "action_arguments" : {
+            "newname" : "qc.csv"
+          },
+          "action_type" : "RenameDatasetAction",
+          "output_name" : "output1"
+        },
+        "RenameDatasetActionoutput2" : {
+          "action_arguments" : {
+            "newname" : "qc.json"
+          },
+          "action_type" : "RenameDatasetAction",
+          "output_name" : "output2"
+        },
+        "RenameDatasetActionoutput3" : {
+          "action_arguments" : {
+            "newname" : "qc.png"
+          },
+          "action_type" : "RenameDatasetAction",
+          "output_name" : "output3"
+        }
+      },
       "content_id" : "testtoolshed.g2.bx.psu.edu/repos/sanbi-uwc/qc/qc_cog_uk/0.1.1",
       "tool_id" : "testtoolshed.g2.bx.psu.edu/repos/sanbi-uwc/qc/qc_cog_uk/0.1.1"
     },
@@ -340,7 +392,15 @@
       "tool_version" : "20201223+galaxy0",
       "annotation" : "",
       "inputs" : [ ],
-      "post_job_actions" : { },
+      "post_job_actions" : {
+        "RenameDatasetActionplot_output" : {
+          "action_arguments" : {
+            "newname" : "plot_output.png"
+          },
+          "action_type" : "RenameDatasetAction",
+          "output_name" : "plot_output"
+        }
+      },
       "content_id" : "toolshed.g2.bx.psu.edu/repos/iuc/jvarkit_wgscoverageplotter/jvarkit_wgscoverageplotter/20201223+galaxy0",
       "tool_id" : "toolshed.g2.bx.psu.edu/repos/iuc/jvarkit_wgscoverageplotter/jvarkit_wgscoverageplotter/20201223+galaxy0"
     }
