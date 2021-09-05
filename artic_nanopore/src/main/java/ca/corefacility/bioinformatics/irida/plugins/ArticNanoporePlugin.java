@@ -25,7 +25,7 @@ public class ArticNanoporePlugin extends Plugin {
 	 * is used to store the type of the analysis pipeline (which should be unique
 	 * for each pipeline).
 	 */
-	public static final AnalysisType DEFAULT = new AnalysisType("DEFAULT");
+	public static final AnalysisType DEFAULT = new AnalysisType("ARTIC_PIPELINE");
 
 	public ArticNanoporePlugin(PluginWrapper wrapper) {
 		super(wrapper);
